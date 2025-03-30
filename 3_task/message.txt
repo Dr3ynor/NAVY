@@ -1,0 +1,76 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from PIL import Image
+import os
+import random
+
+# === Helper Functions ===
+
+def image_to_pattern(path, size=(32, 32)):
+    img = Image.open(path).convert('1')  # binary image
+    img = img.resize(size)
+    pattern = np.array(img, dtype=np.uint8)
+    pattern = np.where(pattern == 0, 1, 0)  # invert: black = 1, white = 0
+    return pattern
+
+def bin_to_bipolar(pattern):
+    return np.where(pattern == 0, -1, 1)
+
+def bipolar_to_bin(pattern):
+    return np.where(pattern == -1, 0, 1)
+
+def train_hopfield(patterns):
+    size = patterns[0].size
+    W = np.zeros((size, size))
+    for p in patterns:
+        v = bin_to_bipolar(p.flatten())
+        W += np.outer(v, v)
+    np.fill_diagonal(W, 0)
+    return W / len(patterns)
+
+def recover(W, pattern, steps=5):
+    v = bin_to_bipolar(pattern.flatten())
+    for _ in range(steps):
+        v = np.sign(np.dot(W, v))
+        v[v == 0] = 1
+    return bipolar_to_bin(v).reshape(pattern.shape)
+
+def corrupt_pattern(pattern, noise_level=0.1):
+    flat = pattern.flatten()
+    n = len(flat)
+    indices = random.sample(range(n), int(n * noise_level))
+    for i in indices:
+        flat[i] = 1 - flat[i]  # flip bit
+    return flat.reshape(pattern.shape)
+
+def show_patterns(original, corrupted, recovered):
+    fig, axs = plt.subplots(1, 3, figsize=(10, 3))
+    axs[0].imshow(original, cmap='gray')
+    axs[0].set_title('Original')
+    axs[1].imshow(corrupted, cmap='gray')
+    axs[1].set_title('Corrupted')
+    axs[2].imshow(recovered, cmap='gray')
+    axs[2].set_title('Recovered')
+    for ax in axs:
+        ax.axis('off')
+    plt.show()
+
+
+
+# === Load patterns ===
+folder = "images"  # složka s .png obrázky
+files = [f for f in os.listdir(folder) if f.endswith('.png')]
+
+patterns = [image_to_pattern(os.path.join(folder, f)) for f in files]
+W = train_hopfield(patterns)
+
+# === Corrupt and recover ===
+i = 0
+for _ in patterns:
+    test_pattern = patterns[i]
+    corrupted = corrupt_pattern(test_pattern.copy(), noise_level=0.3)
+    recovered = recover(W, corrupted)
+
+    # === Show results ===
+    show_patterns(test_pattern, corrupted, recovered)
+    i = i + 1
