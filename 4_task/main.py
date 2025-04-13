@@ -7,7 +7,7 @@ from matplotlib.figure import Figure
 import os
 
 # === Konfigurace ===
-WIDTH, HEIGHT = 1280, 900  # Upravená výška pro lepší fit na obrazovku
+WIDTH, HEIGHT = 1280, 900
 ROWS, COLS = 6, 6
 CELL_SIZE = 80
 BOARD_WIDTH = COLS * CELL_SIZE
@@ -488,7 +488,7 @@ last_agent_move_time = 0
 agent_move_delay = 200  # ms
 
 while running:
-    clock.tick(60)  # 60 FPS pro plynulou vizualizaci
+    clock.tick(60)
     mouse = pygame.mouse.get_pos()
     click = False
 
