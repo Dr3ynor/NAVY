@@ -1,45 +1,72 @@
-# 3D Fraktální generátor
+# L-System Generátor
 
-## Popis kódu
+## Popis programu
+Aplikace pro generování a vizualizaci L-systémů pomocí jazyka Python a knihovny Tkinter. Program umožňuje vytvářet, upravovat a zkoumat fraktální struktury založené na L-systémech.
 
-Tento skript generuje a vizualizuje dvě různé 3D fraktální struktury využívající systém iterated function system (IFS). Program používá náhodný proces pro vytváření bodů v prostoru.
+## Co jsou L-systémy?
 
-### Hlavní funkce
+L-systémy (Lindenmayerovy systémy) jsou formální gramatiky, které se používají k modelování růstu rostlin a různých fraktálních struktur. Každý L-systém se skládá z:
+- **Axiomu**: počáteční řetězec symbolů
+- **Pravidel přepisu**: instrukce, jak nahradit každý symbol v řetězci
+- **Interpretace**: jak převést výsledný řetězec na grafickou reprezentaci
 
-1. **`apply_transform(point, transform)`**: 
-   - Aplikuje afinní transformaci na bod v 3D prostoru
-   - Vstupem je bod jako trojice souřadnic (x, y, z) a transformační matice (12 parametrů)
-   - Vrací nové souřadnice bodu po aplikaci transformace
+## Funkce programu
 
-2. **`generate_fractal(transforms, probabilities, iterations, start_point)`**:
-   - Iterativně vybírá transformace s danou pravděpodobností a aplikuje je na aktuální bod
-   - Začíná s výchozím bodem (defaultně na souřadnicích [0, 0, 0])
-   - Provede specifický počet iterací (defaultně 50 000)
-   - Vrací tři seznamy souřadnic x, y a z všech vygenerovaných bodů
+Program nabízí následující funkce:
+- Generování fraktálů založených na L-systémech
+- Přednastavené typy fraktálů (Koch Snowflake, Koch Curve, Plant, Bush)
+- Možnost definovat vlastní axiomy a pravidla přepisu
+- Nastavení úhlu otáčení, počtu iterací a délky čáry
+- Nastavení počáteční pozice a orientace
+- Přibližování, oddalování a posouvání vygenerovaného fraktálu
+- Barevné zobrazení fraktálu pro lepší vizualizaci hloubky či struktury
 
-### Modely fraktálů
+## Implementace
 
-Kód definuje dva modely fraktálů pomocí různých sad transformací:
+Program je rozdělen do dvou tříd:
 
-1. **První model (`first_model_transforms`)**:
-   - Připomíná 3D kapradinu
-   - Používá čtyři transformace s rovnoměrným rozdělením pravděpodobností
-   - Vytváří strukturu, která má hlavní "stonek" a "listy" vyrůstající do různých směrů
+### 1. LSystemFractal
+Třída se stará o logiku L-systémů:
+- Zpracování axiomu a pravidel přepisu
+- Generování výsledného řetězce po definovaném počtu iterací
+- Vykreslování fraktálu na plátno
 
-2. **Druhý model (`second_model_transforms`)**:
-   - Vykazuje více větvení a jinou strukturu než první model
-   - Používá také čtyři transformace s rovnoměrným rozdělením pravděpodobností
-   - Vytváří více vertikálně orientovaný objekt s komplexním rozvětvením
+### 2. App
+Vytváří grafické uživatelské rozhraní:
+- Inicializace okna aplikace s tmavým tématem
+- Vytvoření ovládacích prvků (vstupní pole, tlačítka)
+- Zpracování událostí uživatelského rozhraní (kliknutí, tažení)
+- Implementace funkcionality přiblížení a posunu
+- Správa přednastavených L-systémů
 
-### Vizualizace
+## Algoritmus generování L-systémů
 
-Pro vizualizaci kódu se používá knihovna Plotly, která umožňuje interaktivní zobrazení 3D struktur:
+Generování L-systému probíhá ve dvou fázích:
 
-- Pro každý model je vytvořen samostatný 3D bodový graf
-- Je možné s nimi interaktivně manipulovat (rotace, přiblížení)
+1. **Generování řetězce**:
+   - Začínáme s axiomem
+   - V každé iteraci procházíme aktuální řetězec znak po znaku
+   - Každý znak nahradíme podle pravidel přepisu (nebo ponecháme, pokud nemá pravidlo)
+   - Po dokončení všech iterací máme výsledný řetězec
+
+2. **Vykreslování řetězce**:
+   - Začínáme na definované pozici s definovaným směrem
+   - Procházíme výsledný řetězec znak po znaku
+   - Interpretujeme každý znak:
+     - 'F': Pohyb vpřed s kreslením čáry
+     - 'b': Pohyb vpřed bez kreslení
+     - '+': Otočení doprava o definovaný úhel
+     - '-': Otočení doleva o definovaný úhel
+     - '[': Uložení aktuální pozice a směru na zásobník
+     - ']': Obnovení poslední uložené pozice a směru ze zásobníku
 
 ## Možná vylepšení
 
-**Optimalizace výkonu**:
-- Implementace vektorových operací s NumPy místo individuálního zpracování bodů
-- Využití paralelního zpracování pro generování více modelů současně
+Z hlediska budoucího rozvoje vidím několik možností pro vylepšení:
+1. **Rozšíření sady symbolů** - přidání více symbolů pro komplexnější struktury
+2. **Export obrázků** - možnost uložit vygenerovaný fraktál jako obrázek
+3. **Více pravidel přepisu** - umožnit definovat více pravidel pro jeden L-systém
+4. **Animace růstu** - vizualizace postupného růstu fraktálu po iteracích
+5. **Optimalizace výkonu** - pro velmi složité L-systémy by mohla být užitečná optimalizace vykreslování
+6. **3D L-systémy** - rozšíření na trojrozměrné L-systémy
+7. **Ukládání L-Systémů** - rozšířit program o možnost perzistentního ukládání dalších fraktálů
